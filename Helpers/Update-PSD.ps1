@@ -17,12 +17,14 @@ Update-ModuleManifest -Path $PSScriptRoot\..\LoggingTools\LoggingTools.psd1 `
   -ModuleVersion $version `
   -Description "PowerShell logging module with multiple targets" `
   -RootModule "LoggingTools.psm1" `
+  -Copyright "GNU GENERAL PUBLIC LICENSE v3" `
   -PowerShellVersion "5.1" `
   -ProjectUri "https://github.com/rezabj/LoggingTools" `
   -HelpInfoUri "https://github.com/rezabj/LoggingTools/Docs" `
-  -PrivateData $PrivateData
+  -PrivateData $PrivateData `
+  -FunctionsToExport $functionlist `
   # -RequiredModules $RequiredModules `
-  # -FunctionsToExport $functionlist `
+
   # -CmdletsToExport "" `
   # -AliasesToExport "" `
   
