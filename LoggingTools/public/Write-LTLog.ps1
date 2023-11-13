@@ -39,11 +39,13 @@ function Write-LTLog {
     $Script:LTLogQueue = New-Object System.Collections.Queue
   }
 
-  $Script:LTLogQueue.Enqueue([PSCustomObject]@{
+  $Script:LTLogQueue.Enqueue(
+    [PSCustomObject]@{
     TimeStamp    = [datetime]::now
     TimeStamputc = [datetime]::UtcNow
     Level = $Level
     Message = $Message
     ErrorRecord = $ErrorRecord
-  })
+    }
+  )
 }
