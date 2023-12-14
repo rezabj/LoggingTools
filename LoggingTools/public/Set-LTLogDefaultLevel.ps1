@@ -23,5 +23,5 @@ function Set-LTLogDefaultLevel {
     [string]$Level
   )
 
-  $Script:LoggingTools.Level = $Level
+  $Script:LTConfig.Level = $Level
 }
