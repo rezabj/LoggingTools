@@ -1,0 +1,19 @@
+title: LoggingTools
+description: Structured PowerShell logging to files, Azure Log Analytics, and Teams.
+url: https://rezabj.github.io
+baseurl: /LoggingTools
+markdown: kramdown
+highlighter: rouge
+defaults:
+  - scope:
+      path: ''
+    values:
+      layout: default
+exclude:
+  - README.md
+  - assets
+  - search
+  - sitemap.xml
+  - sitemap.xml.gz
+  - Gemfile
+  - Gemfile.lock
