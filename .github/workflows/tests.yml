@@ -1,0 +1,73 @@
+name: Tests
+on:
+  push:
+    branches: [Dev, main, 'codex/**']
+  pull_request:
+    branches: [Dev, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pester:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester minimum and analyzer
+        shell: pwsh
+        run: |
+          Install-Module Pester -RequiredVersion 6.2.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+      - name: Pester 6.2.0
+        shell: pwsh
+        run: |
+          Import-Module Pester -RequiredVersion 6.2.0
+          ./tests/Invoke-Tests.ps1
+      - name: Analyze module
+        shell: pwsh
+        run: |
+          $issues = @(Invoke-ScriptAnalyzer -Path ./LoggingTools -Recurse -Settings ./PSScriptAnalyzerSettings.psd1)
+          $issues | Format-Table -AutoSize
+          if ($issues.Count) { throw 'PSScriptAnalyzer reported issues.' }
+      - name: Reference workload benchmarks
+        shell: pwsh
+        run: |
+          foreach ($scenario in @('File', 'MockAzure', 'Combined')) {
+            ./benchmarks/Measure-Logging.ps1 -Scenario $scenario -Rate 1000 -Seconds 60
+            ./benchmarks/Measure-Logging.ps1 -Scenario $scenario -Rate 5000 -Seconds 2
+          }
+          ./benchmarks/Measure-Logging.ps1 -Scenario QueueFull -Rate 1000 -Seconds 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-${{ matrix.os }}
+          path: artifacts/
+  minimum-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke test PowerShell 7.0.13
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          Invoke-WebRequest https://github.com/PowerShell/PowerShell/releases/download/v7.0.13/PowerShell-7.0.13-win-x64.zip -OutFile artifacts/pwsh.zip
+          Expand-Archive artifacts/pwsh.zip artifacts/pwsh70
+          & ./artifacts/pwsh70/pwsh.exe -NoProfile -File ./tests/Smoke.ps1
+          if ($LASTEXITCODE) { throw 'PowerShell 7.0 smoke test failed.' }
+  minimum-linux:
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PowerShell 7.0 dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y curl ca-certificates libicu66 libssl1.1 libunwind8 libgssapi-krb5-2 libstdc++6 zlib1g tar gzip
+          mkdir -p /opt/pwsh70
+          curl --fail --location https://github.com/PowerShell/PowerShell/releases/download/v7.0.13/powershell-7.0.13-linux-x64.tar.gz | tar -xz -C /opt/pwsh70
+          chmod +x /opt/pwsh70/pwsh
+      - name: Smoke test PowerShell 7.0.13
+        run: /opt/pwsh70/pwsh -NoProfile -File ./tests/Smoke.ps1

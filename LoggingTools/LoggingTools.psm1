@@ -1,20 +1,13 @@
-$ScriptPath = Split-Path $MyInvocation.MyCommand.Path
-$PSModule = $ExecutionContext.SessionState.Module
-$PSModuleRoot = $PSModule.ModuleBase
-
-# Dot source public/private functions
-$PublicFunctions = @(Get-ChildItem -Path "$ScriptPath\public" -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue)
-$PrivateFunctions = @(Get-ChildItem -Path "$ScriptPath\private" -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue)
-
-$AllFunctions = $PublicFunctions + $PrivateFunctions
-foreach ($Function in $AllFunctions) {
-    try {
-        . $Function.FullName
-    } catch {
-        throw ('Unable to dot source {0}' -f $Function.FullName)
-    }
+#Requires -Version 7.0
+Set-StrictMode -Version Latest
+if (-not ('LoggingTools.Logger' -as [type])) {
+    Add-Type -Path (Join-Path $PSScriptRoot 'Engine/LoggingEngine.cs') -ErrorAction Stop
 }
-
-Export-ModuleMember -Function $PublicFunctions.BaseName
-
-Start-LTLogManager
+$script:Logger = $null
+$script:DefaultLevel = 'INFO'
+$script:StrictDelivery = $false
+foreach ($folder in @('private', 'public')) {
+    foreach ($file in Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot $folder) -Filter '*.ps1') { . $file.FullName }
+}
+$ExecutionContext.SessionState.Module.OnRemove = { if ($script:Logger) { [void]$script:Logger.Close(2000) } }
+Export-ModuleMember -Function @('Initialize-LTLogConfig', 'Set-LTLogDefaultLevel', 'Write-LTLog', 'Get-LTLogStatus', 'Sync-LTLog', 'Close-LTLog')

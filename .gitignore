@@ -1,1 +1,3 @@
 site/
+artifacts/
+*.user
