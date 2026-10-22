@@ -1,0 +1,29 @@
+:root { color-scheme: light; --ink:#182c3e; --muted:#4c6375; --line:#dce4e8; --blue:#075eb3; }
+* { box-sizing:border-box; }
+body { margin:0; background:#fbfcfd; color:var(--ink); font:17px/1.65 system-ui,-apple-system,Segoe UI,sans-serif; }
+header { background:white; border-bottom:1px solid var(--line); padding:22px max(24px,calc((100vw - 1100px)/2)); }
+.brand { font-size:25px; font-weight:750; color:var(--ink); text-decoration:none; white-space:nowrap; }
+.brand span { font:13px/1.5 ui-monospace,monospace; background:#e4f0fa; color:#07599f; padding:3px 8px; border-radius:5px; }
+nav { display:flex; flex-wrap:wrap; gap:8px 24px; margin-top:12px; font-size:14px; }
+a { color:var(--blue); text-underline-offset:3px; }
+nav a { text-decoration:none; }
+a:hover { text-decoration:underline; }
+a:focus-visible { outline:3px solid #efab30; outline-offset:3px; }
+main { max-width:1000px; margin:auto; padding:40px 28px 64px; }
+h1,h2,h3 { line-height:1.25; letter-spacing:-.02em; }
+h1 { font-size:40px; margin-top:0; }
+h2 { font-size:26px; margin-top:44px; border-top:1px solid var(--line); padding-top:24px; }
+h3 { font-size:21px; margin-top:30px; }
+p,ul,ol { max-width:85ch; }
+code { font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+p code,li code,td code { padding:2px 5px; background:#edf1f5; border-radius:3px; }
+pre { overflow:auto; padding:20px; background:#112839; color:#edf4f9; border-radius:8px; }
+pre code { overflow-wrap:normal; }
+table { display:block; overflow:auto; border-collapse:collapse; width:100%; font-size:15px; margin:24px 0; }
+th,td { padding:11px 14px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+th { background:#eaf0f5; }
+blockquote { border-left:4px solid #d89b24; background:#fff7e5; margin:24px 0; padding:8px 20px; }
+footer { border-top:1px solid var(--line); padding:24px; text-align:center; color:var(--muted); font-size:14px; }
+.skip { position:absolute; left:-9999px; }
+.skip:focus { left:12px; top:12px; background:white; padding:10px; }
+@media(max-width:600px) { h1 { font-size:31px; } main { padding:28px 18px 48px; } header { padding:18px; } }
